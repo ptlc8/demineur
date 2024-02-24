@@ -80,12 +80,13 @@
 					}
 				} else {
 					canvas.aff[y][x] = 9
-					//alert("dead");
+					alert("C'est perdu !\nActualise la page pour réessayer");
 				}
 				if (refreshAtEnd) refresh(canvas, canvas.aff);
 			}
 			function flag(canvas, x, y) {
-				canvas.aff[y][x] = canvas.aff[y][x]==11 ? 10 : 11;
+				if (canvas.aff[y][x] == 10) canvas.aff[y][x] = 11;
+				else if (canvas.aff[y][x] == 11) canvas.aff[y][x] = 10;
 				refresh(canvas, canvas.aff);
 			}
 			function img(src) {
