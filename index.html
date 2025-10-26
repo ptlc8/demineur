@@ -1,105 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html data-app="{ minefield: Minesweeper.createMinefield(24, 24) }">
 	<head>
 		<meta charset="UTF-8" />
 		<title>Démineur</title>
-		<style>
-			html, body {margin: 0;}
-			#game-aff {image-rendering: pixelated; width: 100vw}
-		</style>
+		<script src="index.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/ptlc8/anchovy@0.3.3/src/anchovy.js"></script>
+		<link rel="stylesheet" href="index.css" />
 	</head>
 	<body>
-		<div id="game">
-			<canvas id="game-aff" onclick="onLeftClick(this, event)" oncontextmenu="onRightClick(this, event); return false;" height="100" width =100>ERREUR</canvas>
+		<header>
+			<h1>Démineur</h1>
+		</header>
+		<div class="minefield" data-foreach-row="minefield" data-index="y">
+			<div data-foreach-cell="row" data-index="x">
+				<img data-bind-src="Minesweeper.images[cell.type]"
+					 data-on-click="Minesweeper.demine(minefield, x, y)"
+					 data-on-contextmenu="$event.preventDefault(), Minesweeper.flag(minefield, x, y)"
+					 data-update="cell.type" draggable="false" 
+			</div>
 		</div>
-		<script>
-			var images = [img('assets/nothing.png'), img('assets/1.png'), img('assets/2.png'), img('assets/3.png'), img('assets/4.png'), img('assets/5.png'), img('assets/6.png'), img('assets/7.png'), img('assets/8.png'), img('assets/bomb.png'), img('assets/unknow.png'), img('assets/flag.png')];
-			window.onload = function() {
-				setup(document.getElementById("game-aff"), generateBombs(32,18,0.2));
-			}
-			function generateBombs(width, height, prop) {
-				var n = Math.ceil(width*height*prop);
-				var bombs = [];
-				for (var i = 0; i < height; i++) { //y
-					bombs[i] = [];
-					for (var j = 0; j < width; j++) //x
-						bombs[i][j] = 0;
-				}
-				for (var k = 0; k < n; k++) {
-					var rdmX = Math.floor(Math.random()*width);
-					var rdmY = Math.floor(Math.random()*height);
-					if (bombs[rdmY][rdmX] == 1) k--;
-					else bombs[rdmY][rdmX] = 1;
-				}
-				return bombs;
-			}
-			function setup(canvas, bombs) {
-				if (!canvas) return;
-				var height = bombs.length;
-				var width = bombs.length==0 ? 0 : bombs[0].length;
-				canvas.height = height*16;
-				canvas.width = width*16;
-				canvas.bombs = bombs;
-				canvas.aff = [];
-				for (var i = 0; i < bombs.length; i++) { //y
-					canvas.aff[i] = [];
-					for (var j = 0; j < bombs[i].length; j++) //x
-						canvas.aff[i][j] = 10; //unknow
-				}
-				refresh(canvas, canvas.aff);
-			}
-			function refresh(canvas, aff) {
-				var ctx = canvas.getContext('2d');
-				for (var i = 0; i < Math.min(canvas.height, aff.length); i++) //y
-					for (var j = 0; j < Math.min(canvas.width, aff[i].length); j++) //x
-						ctx.drawImage(images[aff[i][j]], j*16, i*16, 16, 16);
-			}
-			function onLeftClick(canvas, event) {
-				var pos = getPos(event);
-				demine(canvas, Math.floor(pos.x/16), Math.floor(pos.y/16), true);
-			}
-			function onRightClick(canvas, event) {
-				var pos = getPos(event);
-				flag(canvas, Math.floor(pos.x/16), Math.floor(pos.y/16));
-			}
-			function demine(canvas, x, y, refreshAtEnd) {
-				if (canvas.aff[y][x] != 10) return;
-				if (canvas.bombs[y][x] == 0) {
-					var value = 0;
-					for (var i = (y==0 ? 0 : y-1); i <= (y >= canvas.bombs.length-1 ? y : y+1); i++)
-						for (var j = (x-1); j <= (x+1); j++)
-							if (canvas.bombs[i][j] == 1)
-								value++;
-					canvas.aff[y][x] = value;
-					if (value == 0) {
-						for (var i = (y==0 ? 0 : y-1); i <= (y >= canvas.bombs.length-1 ? y : y+1); i++)
-							for (var j = (x-1); j <= (x+1); j++)
-								//setTimeout(function() {
-									demine(canvas, j, i, false);
-								//}, 1000);
-					}
-				} else {
-					canvas.aff[y][x] = 9
-					alert("C'est perdu !\nActualise la page pour réessayer");
-				}
-				if (refreshAtEnd) refresh(canvas, canvas.aff);
-			}
-			function flag(canvas, x, y) {
-				if (canvas.aff[y][x] == 10) canvas.aff[y][x] = 11;
-				else if (canvas.aff[y][x] == 11) canvas.aff[y][x] = 10;
-				refresh(canvas, canvas.aff);
-			}
-			function img(src) {
-				var img = new Image();
-				img.src = src;
-				return img;
-			}
-			function getPos(e) {
-				console.log(e);
-				var rect = e.target.getBoundingClientRect();
-				return {'x': (e.clientX - rect.left) * e.target.width / parseFloat(getComputedStyle(e.target).width),
-					'y': (e.clientY - rect.top) * e.target.height / parseFloat(getComputedStyle(e.target).height)};
-			}
-		</script>
 	</body>
 </html>
