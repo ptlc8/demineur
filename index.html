@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-app="{ minefield: Minesweeper.createMinefield(24, 24) }">
+<html data-app="{ mineweeper: new Minesweeper(24, 24) }">
 	<head>
 		<meta charset="UTF-8" />
 		<title>Démineur</title>
@@ -11,11 +11,11 @@
 		<header>
 			<h1>Démineur</h1>
 		</header>
-		<div class="minefield" data-foreach-row="minefield" data-index="y">
+		<div class="minefield" data-foreach-row="mineweeper.minefield" data-index="y">
 			<div data-foreach-cell="row" data-index="x">
 				<img data-bind-src="Minesweeper.images[cell.type]"
-					 data-on-click="Minesweeper.demine(minefield, x, y)"
-					 data-on-contextmenu="$event.preventDefault(), Minesweeper.flag(minefield, x, y)"
+					 data-on-click="mineweeper.demine(x, y)"
+					 data-on-contextmenu="$event.preventDefault(), mineweeper.flag(x, y)"
 					 data-update="cell.type" draggable="false" 
 			</div>
 		</div>

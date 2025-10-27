@@ -1,6 +1,6 @@
-const Minesweeper = (function() {
+class Minesweeper {
 
-    var images = [
+    static images = [
         'assets/nothing.png',
         'assets/1.png',
         'assets/2.png',
@@ -15,73 +15,75 @@ const Minesweeper = (function() {
         'assets/flag.png',
     ];
 
-    var mines = generateMines(32, 32, 0.15);
+    mines = null;
 
-    function createMinefield(width, height) {
-        let minefield = [];
+    constructor(width = 10, height = 10, mineProportion = 0.15) {
+        this.minefield = [];
         for (let y = 0; y < height; y++) {
-            minefield[y] = [];
+            this.minefield[y] = [];
             for (let x = 0; x < width; x++) {
-                minefield[y][x] = { type: 10 };
+                this.minefield[y][x] = { type: 10 };
             }
         }
-        return minefield;
+        if (mineProportion >= 0.8)
+            mineProportion = 0.8;
+        this.mineCount = Math.ceil(width * height * mineProportion);
     }
 
-    function generateMines(width, height, prop) {
-        var n = Math.ceil(width * height * prop);
-        var mines = [];
-        for (var i = 0; i < height; i++) { //y
-            mines[i] = [];
-            for (var j = 0; j < width; j++) //x
-                mines[i][j] = 0;
+    generateMines(startX, startY) {
+        const width = this.minefield[0].length;
+        const height = this.minefield.length;
+        this.mines = [];
+        for (var i = 0; i < height; i++) { // y
+            this.mines[i] = [];
+            for (var j = 0; j < width; j++) // x
+                this.mines[i][j] = 0;
         }
-        for (var k = 0; k < n; k++) {
+        for (var k = 0; k < this.mineCount; k++) {
             var rdmX = Math.floor(Math.random() * width);
             var rdmY = Math.floor(Math.random() * height);
-            if (mines[rdmY][rdmX] == 1) k--;
-            else mines[rdmY][rdmX] = 1;
+            if (this.mines[rdmY][rdmX] == 1)
+                k--;
+            else if (Math.abs(rdmX - startX) <= 1 && Math.abs(rdmY - startY) <= 1)
+                k--;
+            else
+                this.mines[rdmY][rdmX] = 1;
         }
-        return mines;
     }
 
-    function demine(minefield, x, y) {
+    demine(x, y) {
+        if (this.mines == null) {
+            this.generateMines(x, y);
+        }
         x = +x;
         y = +y;
-        if (minefield[y][x].type != 10) return;
-        if (mines[y][x] == 0) {
+        if (this.minefield[y][x].type != 10) return;
+        if (this.mines[y][x] == 0) {
             var value = 0;
-            for (let i = Math.max(0, y - 1); i <= Math.min(mines.length - 1 , y + 1); i++) {
-                for (let j = Math.max(0, x - 1); j <= Math.min(mines[i].length - 1, x + 1); j++) {
-                    if (mines[i][j] == 1)
+            for (let i = Math.max(0, y - 1); i <= Math.min(this.mines.length - 1 , y + 1); i++) {
+                for (let j = Math.max(0, x - 1); j <= Math.min(this.mines[i].length - 1, x + 1); j++) {
+                    if (this.mines[i][j] == 1)
                         value++;
                 }
             }
-            minefield[y][x].type = value;
+            this.minefield[y][x].type = value;
             if (value == 0) {
-                for (let i = Math.max(0, y - 1); i <= Math.min(mines.length - 1 , y + 1); i++)
-                    for (let j = Math.max(0, x - 1); j <= Math.min(mines[i].length - 1, x + 1); j++)
-                        setTimeout(function() {
-                            demine(minefield, j, i);
+                for (let i = Math.max(0, y - 1); i <= Math.min(this.mines.length - 1 , y + 1); i++)
+                    for (let j = Math.max(0, x - 1); j <= Math.min(this.mines[i].length - 1, x + 1); j++)
+                        setTimeout(() => {
+                            this.demine(j, i);
                         }, 100);
             }
         } else {
-            minefield[y][x].type = 9
+            this.minefield[y][x].type = 9
             alert("C'est perdu !\nActualise la page pour réessayer");
         }
     }
 
-    function flag(minefield, x, y) {
-        if (minefield[y][x].type == 10)
-            minefield[y][x].type = 11;
-        else if (minefield[y][x].type == 11)
-            minefield[y][x].type = 10;
+    flag(x, y) {
+        if (this.minefield[y][x].type == 10)
+            this.minefield[y][x].type = 11;
+        else if (this.minefield[y][x].type == 11)
+            this.minefield[y][x].type = 10;
     }
-
-    return {
-        images,
-        createMinefield,
-        demine,
-        flag
-    };
-})();
+}
