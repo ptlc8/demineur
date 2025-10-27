@@ -9,14 +9,18 @@
 	</head>
 	<body>
 		<header>
-			<h1>Démineur</h1>
+			<h1>
+				<span data-bind="mineweeper.alive ? '😊' : '😵'" data-update="mineweeper.alive"></span>
+				Démineur
+				<span data-bind="mineweeper.alive ? '😼' : '😿'" data-update="mineweeper.alive"></span>
+			</h1>
 		</header>
 		<div class="minefield" data-foreach-row="mineweeper.minefield" data-index="y">
 			<div data-foreach-cell="row" data-index="x">
 				<img data-bind-src="Minesweeper.images[cell.type]"
 					 data-on-click="mineweeper.demine(x, y)"
 					 data-on-contextmenu="$event.preventDefault(), mineweeper.flag(x, y)"
-					 data-update="cell.type" draggable="false" 
+					 data-update="cell.type" draggable="false" />
 			</div>
 		</div>
 	</body>

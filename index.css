@@ -25,6 +25,7 @@ h1 {
     margin: auto;
     display: flex;
     flex-direction: column;
+    user-select: none;
 }
 
 .minefield > div {

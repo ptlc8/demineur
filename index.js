@@ -15,8 +15,6 @@ class Minesweeper {
         'assets/flag.png',
     ];
 
-    mines = null;
-
     constructor(width = 10, height = 10, mineProportion = 0.15) {
         this.minefield = [];
         for (let y = 0; y < height; y++) {
@@ -28,6 +26,8 @@ class Minesweeper {
         if (mineProportion >= 0.8)
             mineProportion = 0.8;
         this.mineCount = Math.ceil(width * height * mineProportion);
+        this.mines = null;
+        this.alive = true;
     }
 
     generateMines(startX, startY) {
@@ -52,6 +52,7 @@ class Minesweeper {
     }
 
     demine(x, y) {
+        if (!this.alive) return;
         if (this.mines == null) {
             this.generateMines(x, y);
         }
@@ -76,11 +77,13 @@ class Minesweeper {
             }
         } else {
             this.minefield[y][x].type = 9
+            this.alive = false;
             alert("C'est perdu !\nActualise la page pour réessayer");
         }
     }
 
     flag(x, y) {
+        if (!this.alive) return;
         if (this.minefield[y][x].type == 10)
             this.minefield[y][x].type = 11;
         else if (this.minefield[y][x].type == 11)
