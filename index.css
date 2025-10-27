@@ -38,3 +38,12 @@ h1 {
     flex: 1;
     image-rendering: pixelated;
 }
+
+footer {
+    text-align: center;
+    margin: 1vmin;
+}
+
+footer button {
+    font-size: 2vmin;
+}

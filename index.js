@@ -28,6 +28,7 @@ class Minesweeper {
         this.mineCount = Math.ceil(width * height * mineProportion);
         this.mines = null;
         this.alive = true;
+        this.cleared = false;
     }
 
     generateMines(startX, startY) {
@@ -51,6 +52,16 @@ class Minesweeper {
         }
     }
 
+    isCleared() {
+        for (let y = 0; y < this.minefield.length; y++) {
+            for (let x = 0; x < this.minefield[y].length; x++) {
+                if (!this.mines[y][x] && this.minefield[y][x].type == 10)
+                    return false;
+            }
+        }
+        return true;
+    }
+
     demine(x, y) {
         if (!this.alive) return;
         if (this.mines == null) {
@@ -59,26 +70,30 @@ class Minesweeper {
         x = +x;
         y = +y;
         if (this.minefield[y][x].type != 10) return;
-        if (this.mines[y][x] == 0) {
-            var value = 0;
-            for (let i = Math.max(0, y - 1); i <= Math.min(this.mines.length - 1 , y + 1); i++) {
-                for (let j = Math.max(0, x - 1); j <= Math.min(this.mines[i].length - 1, x + 1); j++) {
-                    if (this.mines[i][j] == 1)
-                        value++;
-                }
-            }
-            this.minefield[y][x].type = value;
-            if (value == 0) {
-                for (let i = Math.max(0, y - 1); i <= Math.min(this.mines.length - 1 , y + 1); i++)
-                    for (let j = Math.max(0, x - 1); j <= Math.min(this.mines[i].length - 1, x + 1); j++)
-                        setTimeout(() => {
-                            this.demine(j, i);
-                        }, 100);
-            }
-        } else {
+        if (this.mines[y][x]) {
             this.minefield[y][x].type = 9
             this.alive = false;
             alert("C'est perdu !\nActualise la page pour réessayer");
+            return;
+        }
+        var value = 0;
+        for (let i = Math.max(0, y - 1); i <= Math.min(this.mines.length - 1 , y + 1); i++) {
+            for (let j = Math.max(0, x - 1); j <= Math.min(this.mines[i].length - 1, x + 1); j++) {
+                if (this.mines[i][j])
+                    value++;
+            }
+        }
+        this.minefield[y][x].type = value;
+        if (value == 0) {
+            for (let i = Math.max(0, y - 1); i <= Math.min(this.mines.length - 1 , y + 1); i++)
+                for (let j = Math.max(0, x - 1); j <= Math.min(this.mines[i].length - 1, x + 1); j++)
+                    setTimeout(() => {
+                        this.demine(j, i);
+                    }, 100);
+        }
+        if (this.isCleared()) {
+            this.cleared = true;
+            alert("C'est gagné !\nActualise la page pour rejouer");
         }
     }
 
